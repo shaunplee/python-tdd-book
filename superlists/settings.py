@@ -25,7 +25,7 @@ SECRET_KEY = '#ecq^pqxlh=g%w_kn^49e=uw73)7cxm7lwtp-yvm8vdze67)4j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "dogslove.curlyfri.es"]
 
 
 # Application definition
