@@ -5,14 +5,15 @@ name = "pypi"
 
 [packages]
 django = "<1.12"
+
+[dev-packages]
 selenium = "<4"
 jedi = "*"
 rope = "*"
 "autopep8" = "*"
 yapf = "*"
 "flake8" = "*"
-
-[dev-packages]
+python-language-server = {version = "*", extras = ["all"]}
 
 [requires]
 python_version = "3.7"
