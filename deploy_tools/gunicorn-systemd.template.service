@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn server for DOMAIN
+
+[Service]
+Restart=on-failure
+User=shaun
+WorkingDirectory=/home/shaun/sites/DOMAIN
+EnvironmentFile=/home/shaun/sites/DOMAIN/.env
+
+ExecStart=/home/shaun/.local/bin/pipenv run gunicorn \
+    --bind unix:/tmp/DOMAIN.socket \
+    superlists.wsgi:application
+
+[Install]
+WantedBy=muilt-user.target
