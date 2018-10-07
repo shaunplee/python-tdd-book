@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 django = "<1.12"
+gunicorn = "*"
 
 [dev-packages]
 selenium = "<4"
@@ -14,6 +15,8 @@ rope = "*"
 yapf = "*"
 "flake8" = "*"
 python-language-server = {version = "*", extras = ["all"]}
+pyls-mypy = "*"
+"fabric3" = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3"
