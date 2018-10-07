@@ -4,3 +4,4 @@ virtualenv
 *.pyc
 Pipfile.lock
 /static
+.env
