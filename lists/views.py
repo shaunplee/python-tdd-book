@@ -10,6 +10,7 @@ def home_page(request):
 
 def view_list(request, list_id):
     list_ = List.objects.get(id=list_id)
+    error = ""
     if request.method == 'POST':
         try:
             item = Item(text=request.POST['item_text'], list=list_)
