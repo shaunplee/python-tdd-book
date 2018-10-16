@@ -1,1 +1,2 @@
 * TODO remove hardcoded URLs from views.py
+* TODO remove hardcoded URL from forms in list.html and home.html
