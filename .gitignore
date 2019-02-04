@@ -5,3 +5,4 @@ virtualenv
 Pipfile.lock
 /static
 .env
+.mypy_cache
