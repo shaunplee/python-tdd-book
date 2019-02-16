@@ -14,9 +14,9 @@ rope = "*"
 "autopep8" = "*"
 yapf = "*"
 "flake8" = "*"
-python-language-server = {version = "*", extras = ["all"]}
+python-language-server = {extras = ["all"],version = "*"}
 pyls-mypy = "*"
 "fabric3" = "*"
 
 [requires]
-python_version = "3.6.6"
+python_version = "3.7.2"
