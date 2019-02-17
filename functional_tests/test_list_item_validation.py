@@ -60,7 +60,7 @@ class ItemValidationTest(FunctionalTest):
 
         # She sees a helpful error message
         self.wait_for(lambda: self.assertEqual(
-            self.get_error_element.text,
+            self.get_error_element().text,
             "You've already got this in your list"
         ))
 
