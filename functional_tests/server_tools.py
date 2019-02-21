@@ -6,10 +6,14 @@ def _get_manage_dot_py(host):
     return f'~/sites/{host}/virtualenv/python ~/sites/{host}/manage.py'
 
 
+def _get_path(host):
+    return f'~/sites/{host}/'
+
+
 def reset_database(host):
-    manage_dot_py = _get_manage_dot_py(host)
     with settings(host_string=f'shaun@{host}'):
-        run(f'{manage_dot_py} flush --noinput')
+        with cd(_get_path(host)):
+            run(f'pipenv run python manage.py flush --noinput')
 
 
 def _get_server_env_vars(host):
@@ -18,11 +22,10 @@ def _get_server_env_vars(host):
 
 
 def create_session_on_server(host, email):
-    manage_dot_py = _get_manage_dot_py(host)
     with settings(host_string=f'shaun@{host}'):
         env_vars = _get_server_env_vars(host)
         with shell_env(**env_vars):
-            with cd(f'~/sites/{host}/'):
+            with cd(_get_path(host)):
                 session_key = run(
                     f'pipenv run python manage.py create_session {email}'
                 )
