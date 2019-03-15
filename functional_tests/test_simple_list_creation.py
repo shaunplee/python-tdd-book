@@ -5,7 +5,9 @@ from selenium.webdriver.common.keys import Keys
 
 
 class NewVisitorTest(FunctionalTest):
-
+    """
+    Tests list creation without login.
+    """
     def test_can_start_a_list_for_one_user(self):
         # Edith has heard about a cool new online to-do app. She goes to check
         # out its home page
@@ -41,9 +43,12 @@ class NewVisitorTest(FunctionalTest):
         # Satisfied, she goes back to sleep
 
     def test_multiple_users_can_start_lists_at_different_urls(self):
+        """
+        Tries to create two different lists for two different users
+        without collision.
+        """
         # Edith starts a new to-do list
         self.browser.get(self.live_server_url)
-        inputbox = self.get_item_input_box()
         self.add_list_item("Buy peacock feathers")
 
         # She notices that her list has a unique URL
@@ -52,8 +57,8 @@ class NewVisitorTest(FunctionalTest):
 
         # Now a new user, Francis, comes along to the site
 
-        ## We use a new browser session to make sure that no
-        ## information of Edith's is coming through from cookies etc.
+        # We use a new browser session to make sure that no
+        # information of Edith's is coming through from cookies etc.
         self.browser.quit()
         self.browser = webdriver.Chrome()
 
@@ -65,7 +70,6 @@ class NewVisitorTest(FunctionalTest):
 
         # Francis starts a new list by entering a new item. He is less
         # interesting than Edith...
-        inputbox = self.get_item_input_box()
         self.add_list_item('Buy milk')
 
         # Francis gets his own unique URLconf
