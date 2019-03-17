@@ -1,3 +1,5 @@
+import bleach
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
@@ -18,10 +20,16 @@ def view_list(request, list_id):
     if request.method == 'POST':
         form = ExistingListItemForm(for_list=list_, data=request.POST)
         if form.is_valid():
-            Item.objects.create(text=request.POST['text'], list=list_)
+            if (not(list_.owner) or
+                (request.user == list_.owner) or
+                (request.user in list_.shared_with.all())):
+                Item.objects.create(text=request.POST['text'], list=list_)
             return redirect(list_)
-    return render(request, 'list.html', {'list': list_,
-                                         'form': form, })
+    return render(
+        request,
+        'list.html',
+        {'list': list_,
+         'form': form})
 
 
 def old_new_list(request):
@@ -48,3 +56,23 @@ def new_list(request):
 def my_lists(request, email):
     owner = User.objects.get(email=email)
     return render(request, 'my_lists.html', {'owner': owner})
+
+
+def share_list(request, list_id):
+    list_ = List.objects.get(id=list_id)
+    if request.method == 'POST':
+        input_sharee_email = bleach.clean(request.POST['sharee'])
+        try:
+            sharee = User.objects.get(email=input_sharee_email)
+            list_.shared_with.add(sharee.email)
+        except:
+            return render(
+                request,
+                'list.html',
+                {'list': list_,
+                 'share_error': user_not_found_string(input_sharee_email)})
+    return redirect(list_)
+
+
+def user_not_found_string(email):
+    return f"User '{email}' not found."

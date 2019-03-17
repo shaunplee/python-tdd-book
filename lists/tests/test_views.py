@@ -1,7 +1,7 @@
 from lists.forms import (ExistingListItemForm, ItemForm,
                          DUPLICATE_ITEM_ERROR, EMPTY_ITEM_ERROR)
 from lists.models import Item, List
-from lists.views import home_page, new_list
+from lists.views import home_page, new_list, user_not_found_string, view_list
 
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
@@ -224,3 +224,89 @@ class NewListViewUnitTest(unittest.TestCase):
         mock_form.is_valid.return_value = False
         new_list(self.request)
         self.assertFalse(mock_form.save.called)
+
+
+class ShareListTest(TestCase):
+    """
+    Unit tests for list sharing features.
+    """
+
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.POST['text'] = 'new list item'
+        self.request.user = User.objects.create(email='a@b.com')
+        new_list(self.request)
+        self.list = List.objects.first()
+
+    def test_post_redirects_to_lists_page(self):
+        response = self.client.post(
+            f'/lists/{self.list.id}/share',
+            data={'list_id': self.list.id,
+                  'sharee': self.request.user.email}
+        )
+        self.assertRedirects(response, f'/lists/{self.list.id}/')
+
+    def test_add_list_owner_to_shared_with(self):
+        self.client.post(f'/lists/{self.list.id}/share',
+                          data={'list_id': self.list.id,
+                                'sharee': self.request.user.email}
+        )
+        self.assertIn(self.request.user, self.list.shared_with.all())
+
+    def test_add_another_user_to_shared_with(self):
+        sharee = User.objects.create(email="cherie@example.com")
+        self.client.post(f'/lists/{self.list.id}/share',
+                          data={'list_id': self.list.id,
+                                'sharee': sharee.email}
+        )
+        self.assertIn(sharee, self.list.shared_with.all())
+
+    def test_add_invalid_user_to_shared_with_shows_error(self):
+        invalid_user_email = "invalid_user@example.com"
+        response = self.client.post(f'/lists/{self.list.id}/share',
+                                    data={'list_id': self.list.id,
+                                          'sharee': invalid_user_email}
+        )
+        self.assertContains(response,
+                            escape(user_not_found_string(invalid_user_email)))
+
+    def test_add_invalid_user_to_shared_with_has_no_effect(self):
+        num_prev_shared_with = len(self.list.shared_with.all())
+        self.client.post(f'/lists/{self.list.id}/share',
+                         data={'list_id': self.list.id,
+                               'sharee': "dogggg@example.com"}
+        )
+        self.assertEqual(num_prev_shared_with, len(self.list.shared_with.all()))
+
+    def test_list_view_shows_shared_with_users(self):
+        sharee = User.objects.create(email="cherie@example.com")
+        self.client.post(f'/lists/{self.list.id}/share',
+                         data={'list_id': self.list.id,
+                               'sharee': sharee.email})
+        response = self.client.get(f'/lists/{self.list.id}', follow=True)
+        self.assertContains(response, escape(sharee.email))
+
+    def test_shared_with_user_can_add_to_list(self):
+        sharee = User.objects.create(email="cherie@example.com")
+        self.client.post(f'/lists/{self.list.id}/share',
+                         data={'list_id': self.list.id,
+                               'sharee': sharee.email})
+        sharee_request = HttpRequest()
+        sharee_request.user = sharee
+        sharee_request.method = 'POST'
+        sharee_request.POST['text'] = "sharee item"
+        # POST new item
+        view_list(sharee_request, self.list.id)
+        response = self.client.get(f'/lists/{self.list.id}', follow=True)
+        self.assertContains(response, escape("sharee item"))
+
+    def test_not_shared_with_user_cannot_add_to_list(self):
+        not_sharee_request = HttpRequest()
+        not_sharee_request.user = User.objects.create(
+            email="notcherie@example.com")
+        not_sharee_request.method = 'POST'
+        not_sharee_request.POST['text'] = "sharee item"
+        # POST new item
+        view_list(not_sharee_request, self.list.id)
+        response = self.client.get(f'/lists/{self.list.id}', follow=True)
+        self.assertNotContains(response, escape("sharee item"))

@@ -9,6 +9,9 @@ class List(models.Model):
     """
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 
+    shared_with = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                         related_name='user_of')
+
     def get_absolute_url(self):
         """
         Returns the absolute url to this list.
