@@ -236,7 +236,7 @@
             ],
             "version": "==0.6.1"
         },
-        "mypy": {
+        "more-itertools": {
             "hashes": [
                 "sha256:15b948e1302682e3682f11f50208b726a246ab4e6c1b39f9264a8796bb416aa2",
                 "sha256:219a3116ecd015f8dca7b5d2c366c973509dfb9a8fc97ef044a36e3da66144a1",
